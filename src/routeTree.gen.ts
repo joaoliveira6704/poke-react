@@ -11,8 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PokemonsIndexRouteImport } from './routes/pokemons/index'
-import { Route as PokemonsNameRouteImport } from './routes/pokemons/$name'
+import { Route as PokedexIndexRouteImport } from './routes/pokedex/index'
+import { Route as PokedexNameRouteImport } from './routes/pokedex/$name'
+import { Route as AuthPathnameRouteImport } from './routes/auth.$pathname'
 
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
@@ -24,49 +25,64 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PokemonsIndexRoute = PokemonsIndexRouteImport.update({
-  id: '/pokemons/',
-  path: '/pokemons/',
+const PokedexIndexRoute = PokedexIndexRouteImport.update({
+  id: '/pokedex/',
+  path: '/pokedex/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PokemonsNameRoute = PokemonsNameRouteImport.update({
-  id: '/pokemons/$name',
-  path: '/pokemons/$name',
+const PokedexNameRoute = PokedexNameRouteImport.update({
+  id: '/pokedex/$name',
+  path: '/pokedex/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthPathnameRoute = AuthPathnameRouteImport.update({
+  id: '/auth/$pathname',
+  path: '/auth/$pathname',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
-  '/pokemons/$name': typeof PokemonsNameRoute
-  '/pokemons/': typeof PokemonsIndexRoute
+  '/auth/$pathname': typeof AuthPathnameRoute
+  '/pokedex/$name': typeof PokedexNameRoute
+  '/pokedex/': typeof PokedexIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
-  '/pokemons/$name': typeof PokemonsNameRoute
-  '/pokemons': typeof PokemonsIndexRoute
+  '/auth/$pathname': typeof AuthPathnameRoute
+  '/pokedex/$name': typeof PokedexNameRoute
+  '/pokedex': typeof PokedexIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
-  '/pokemons/$name': typeof PokemonsNameRoute
-  '/pokemons/': typeof PokemonsIndexRoute
+  '/auth/$pathname': typeof AuthPathnameRoute
+  '/pokedex/$name': typeof PokedexNameRoute
+  '/pokedex/': typeof PokedexIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/pokemons/$name' | '/pokemons/'
+  fullPaths: '/' | '/home' | '/auth/$pathname' | '/pokedex/$name' | '/pokedex/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/pokemons/$name' | '/pokemons'
-  id: '__root__' | '/' | '/home' | '/pokemons/$name' | '/pokemons/'
+  to: '/' | '/home' | '/auth/$pathname' | '/pokedex/$name' | '/pokedex'
+  id:
+    | '__root__'
+    | '/'
+    | '/home'
+    | '/auth/$pathname'
+    | '/pokedex/$name'
+    | '/pokedex/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HomeRoute: typeof HomeRoute
-  PokemonsNameRoute: typeof PokemonsNameRoute
-  PokemonsIndexRoute: typeof PokemonsIndexRoute
+  AuthPathnameRoute: typeof AuthPathnameRoute
+  PokedexNameRoute: typeof PokedexNameRoute
+  PokedexIndexRoute: typeof PokedexIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,18 +101,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pokemons/': {
-      id: '/pokemons/'
-      path: '/pokemons'
-      fullPath: '/pokemons/'
-      preLoaderRoute: typeof PokemonsIndexRouteImport
+    '/pokedex/': {
+      id: '/pokedex/'
+      path: '/pokedex'
+      fullPath: '/pokedex/'
+      preLoaderRoute: typeof PokedexIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pokemons/$name': {
-      id: '/pokemons/$name'
-      path: '/pokemons/$name'
-      fullPath: '/pokemons/$name'
-      preLoaderRoute: typeof PokemonsNameRouteImport
+    '/pokedex/$name': {
+      id: '/pokedex/$name'
+      path: '/pokedex/$name'
+      fullPath: '/pokedex/$name'
+      preLoaderRoute: typeof PokedexNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/$pathname': {
+      id: '/auth/$pathname'
+      path: '/auth/$pathname'
+      fullPath: '/auth/$pathname'
+      preLoaderRoute: typeof AuthPathnameRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -105,8 +128,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HomeRoute: HomeRoute,
-  PokemonsNameRoute: PokemonsNameRoute,
-  PokemonsIndexRoute: PokemonsIndexRoute,
+  AuthPathnameRoute: AuthPathnameRoute,
+  PokedexNameRoute: PokedexNameRoute,
+  PokedexIndexRoute: PokedexIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

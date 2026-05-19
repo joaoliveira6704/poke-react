@@ -5,6 +5,7 @@ import {
   Bot,
   Camera,
   ChartArea,
+  Coins,
   Database,
   Dog,
   File,
@@ -57,9 +58,14 @@ const data = {
       icon: Store,
     },
     {
-      title: "Pokemons",
-      url: "/pokemons",
+      title: "Pokedex",
+      url: "/pokedex",
       icon: Dog,
+    },
+    {
+      title: "Current Points: 20",
+      url: "",
+      icon: Coins,
     },
   ],
   navClouds: [

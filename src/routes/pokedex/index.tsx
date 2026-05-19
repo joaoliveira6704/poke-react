@@ -3,8 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { type Pokemon } from "#/types/Pokemon";
 import { PokemonCard } from "#/components/cards/PokemonCard";
 import { Paginate } from "#/components/Paginate";
+import { PokemonCardSkeleton } from "#/components/cards/PokemonCardSkeleton";
 
-export const Route = createFileRoute("/pokemons/")({
+export const Route = createFileRoute("/pokedex/")({
   validateSearch: (search) => ({
     page: Number(search.page ?? 1),
   }),
@@ -33,27 +34,28 @@ function RouteComponent() {
 
   return (
     <div className="flex-1 w-full text-center py-6 px-8">
-      <h1 className="text-3xl font-bold">Pokemons</h1>
+      <h1 className="text-3xl font-bold">Pokédex</h1>
       <p className="text-neutral-400 mt-2 text-base">
         Search for your favorite pokemons!
       </p>
       <div className="mt-8">
-        {isLoading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
-        {data && (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-              {data.results.map((pokemon, index) => (
-                <PokemonCard
-                  key={pokemon.name}
-                  name={pokemon.name}
-                  idx={offset + index + 1}
-                />
-              ))}
-            </div>
-            <Paginate previous={data.previous} next={data.next} />
-          </>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+          {isLoading &&
+            [...Array(20)].map((_, index) => (
+              <PokemonCardSkeleton key={index} />
+            ))}
+          {data &&
+            data?.results.map((pokemon, index) => (
+              <PokemonCard
+                key={pokemon.name}
+                name={pokemon.name}
+                idx={offset + index + 1}
+              />
+            ))}
+        </div>
+
+        {data?.next && <Paginate previous={data.previous} next={data.next} />}
       </div>
     </div>
   );

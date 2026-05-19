@@ -1,14 +1,47 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SignedIn, UserButton, RedirectToSignIn } from "@neondatabase/auth-ui";
+import { authClient } from "@/auth";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  component: Home,
+});
 
 function Home() {
+  const { data } = authClient.useSession();
+
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to Pokemark</h1>
-      <p className="mt-4 text-lg">
-        Here, you can search for and mark your favorite Pokémon.
-      </p>
-    </div>
+    <>
+      <SignedIn>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+            gap: "2rem",
+          }}
+        >
+          <div style={{ textAlign: "center" }}>
+            <h1>Welcome!</h1>
+            <p>You're successfully authenticated.</p>
+            <UserButton />
+            <p className="font-medium text-gray-700 dark:text-gray-200 mt-4">
+              Session and User Data:
+            </p>
+            <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap break-words w-full max-w-full sm:max-w-2xl mx-auto text-left">
+              <code>
+                {JSON.stringify(
+                  { session: data?.session, user: data?.user },
+                  null,
+                  2,
+                )}
+              </code>
+            </pre>
+          </div>
+        </div>
+      </SignedIn>
+      <RedirectToSignIn />
+    </>
   );
 }
