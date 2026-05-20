@@ -27,3 +27,21 @@ export function getStoredUser(): User | null {
   if (!token) return null;
   return null; // token exists but user info isn't stored client-side
 }
+
+export async function register(
+  name: string,
+  username: string,
+  password: string,
+): Promise<User> {
+  const response = await fetch(`${BASE_URL}/api/v1/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, username, password }),
+  });
+  if (!response.ok) {
+    throw new Error("Registration failed");
+  }
+  const data = await response.json();
+  localStorage.setItem("auth-token", data.token);
+  return { id: data.id, username: data.username };
+}

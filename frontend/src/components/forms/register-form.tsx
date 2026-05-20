@@ -15,34 +15,45 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-interface LoginFormProps extends React.ComponentProps<"div"> {
-  onLogin?: (data: FormData) => Promise<void>;
+interface RegisterFormProps extends React.ComponentProps<"div"> {
+  onRegister?: (data: FormData) => Promise<void>;
   loading?: boolean;
 }
 
-export function LoginForm({
+export function RegisterForm({
   className,
-  onLogin,
+  onRegister,
   loading,
   ...props
-}: LoginFormProps) {
+}: RegisterFormProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await onLogin?.(new FormData(e.currentTarget));
+    await onRegister?.(new FormData(e.currentTarget));
   };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+          <CardTitle>Register for an account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your email below to register for an account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="ashketchum"
+                  required
+                  disabled={loading}
+                />
+              </Field>
               <Field>
                 <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
@@ -74,13 +85,10 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit" disabled={loading}>
-                  {loading ? "Logging in..." : "Login"}
-                </Button>
-                <Button variant="outline" type="button" disabled={loading}>
-                  Login with Google
+                  {loading ? "Registering..." : "Register"}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="/register">Sign up</a>
+                  Already have an account? <a href="/login">Sign in</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

@@ -1,5 +1,9 @@
 import { type FastifyRequest, type FastifyReply } from "fastify";
 import { db } from "../services/db.service";
+import { account } from "../models/account.schema";
+import { user } from "../models/user.schema";
+import { randomUUIDv7 } from "bun";
+import { session } from "../models/session.schema";
 
 type Body = { username: string; password: string };
 
@@ -9,47 +13,51 @@ export async function login(
   req: FastifyRequest<{ Body: Body }>,
   res: FastifyReply,
 ) {
-  if (!req.body) {
-    return res
-      .status(400)
-      .send({ code: 400, status: "error", message: "Missing request body" });
-  }
-  const { username, password } = req.body;
+  try {
+    if (!req.body) {
+      return res
+        .status(400)
+        .send({ code: 400, status: "error", message: "Missing request body" });
+    }
 
-  const result = await db.query.user.findFirst({
-    where: (user, { eq }) => eq(user.username, username),
-    with: {
-      account: true,
-    },
-  });
+    const { username, password } = req.body;
 
-  if (!result || result.account.password !== password) {
-    return res
-      .status(400)
-      .send({ code: 400, status: "error", message: "Invalid credentials" });
-  }
+    const result = await db.query.user.findFirst({
+      where: (u, { eq }) => eq(u.username, username),
+      with: { account: true },
+    });
 
-  const session = await db.query.session.findFirst({
-    where: (s, { eq }) => eq(s.userId, result.id),
-  });
+    if (!result || result.account?.password !== password) {
+      return res
+        .status(400)
+        .send({ code: 400, status: "error", message: "Invalid credentials" });
+    }
 
-  if (!session) {
+    let existingSession = await db.query.session.findFirst({
+      where: (s, { eq }) => eq(s.userId, result.id),
+    });
+
+    if (!existingSession) {
+      const [created] = await db
+        .insert(session)
+        .values({ userId: result.id, token: randomUUIDv7() })
+        .returning();
+      existingSession = created;
+    }
+
+    return res.status(200).send({
+      id: result.id,
+      username: result.username,
+      token: existingSession.token,
+    });
+  } catch (err) {
+    req.log.error(err, "login error");
     return res
       .status(500)
-      .send({ code: 500, status: "error", message: "No session found" });
+      .send({ code: 500, status: "error", message: "Internal server error" });
   }
-
-  return res.status(200).send({
-    id: result.id,
-    username: result.username,
-    token: session.token,
-  });
 }
-
-export async function validateToken(
-  req: FastifyRequest,
-  res: FastifyReply,
-) {
+export async function validateToken(req: FastifyRequest, res: FastifyReply) {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
@@ -82,4 +90,36 @@ export async function validateToken(
     req.log.error(err, "validate-token error");
     return res.status(500).send({ valid: false });
   }
+}
+
+export async function registerUser(
+  req: FastifyRequest<{ Params: Params }>,
+  res: FastifyReply,
+) {
+  const { name, username, password } = req.body;
+
+  const existing = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.username, username),
+  });
+
+  if (existing) {
+    return res
+      .status(400)
+      .send({ code: 400, status: "error", message: "Username already taken" });
+  }
+
+  // Insert user
+  const [newUser] = await db
+    .insert(user)
+    .values({ name, username })
+    .returning();
+
+  // Insert account (password)
+  await db.insert(account).values({ userId: newUser.id, password }).returning();
+
+  return res.status(200).send({
+    id: newUser.id,
+    username: newUser.username,
+    name: newUser.name,
+  });
 }

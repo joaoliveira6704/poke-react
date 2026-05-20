@@ -1,5 +1,9 @@
 import { type FastifyInstance, type RouteShorthandOptions } from "fastify";
-import { login, validateToken } from "../../controllers/auth.controller";
+import {
+  login,
+  registerUser,
+  validateToken,
+} from "../../controllers/auth.controller";
 
 const opts: RouteShorthandOptions = {
   schema: {
@@ -28,4 +32,5 @@ const opts: RouteShorthandOptions = {
 export default async function authRoutes(server: FastifyInstance) {
   server.post("/login", opts, login);
   server.get("/validate-token", validateToken);
+  server.post("/register", opts, registerUser);
 }

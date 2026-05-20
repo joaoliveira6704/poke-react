@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { LoginForm } from "#/components/forms/login-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { login } from "../auth";
+import { login } from "#/auth";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/_unauthenticated/login")({
   validateSearch: (search: Record<string, string | undefined>) => ({
     redirect: search.redirect,
   }),

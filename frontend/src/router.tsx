@@ -1,19 +1,17 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-import type { ReactNode } from "react";
-import { QueryClient } from "@tanstack/react-query";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
-import TanstackQueryProvider, {
-  getContext,
-} from "./integrations/tanstack-query/root-provider";
+import { getContext } from "./integrations/tanstack-query/root-provider";
+import type { AuthHook } from "./hooks/useAuth";
 
-export function getRouter() {
+export function getRouter(authentication?: AuthHook) {
   const context = getContext();
 
   const router = createTanStackRouter({
     routeTree,
     context: {
       queryClient: context.queryClient,
+      authentication: authentication ?? ({} as AuthHook),
     },
     scrollRestoration: true,
     defaultPreload: "intent",
@@ -21,7 +19,6 @@ export function getRouter() {
   });
 
   setupRouterSsrQueryIntegration({ router, queryClient: context.queryClient });
-
   return router;
 }
 

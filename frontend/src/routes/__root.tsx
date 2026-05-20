@@ -1,22 +1,21 @@
 import {
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-
-import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
-
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import appCss from "../styles.css?url";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SidebarInset, SidebarProvider } from "#/components/ui/sidebar";
 import { AppSidebar } from "#/components/app-sidebar";
 import { TooltipProvider } from "#/components/ui/tooltip";
+import type { AuthHook } from "#/hooks/useAuth";
 
 interface MyRouterContext {
   queryClient: QueryClient;
+  authentication: AuthHook;
 }
 
 const queryClient = new QueryClient();
@@ -24,23 +23,11 @@ const queryClient = new QueryClient();
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "TanStack Start Starter",
-      },
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "TanStack Start Starter" },
     ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   shellComponent: RootDocument,
 });
@@ -63,22 +50,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               }
             >
               <AppSidebar variant="inset" />
-              <SidebarInset>
-                {children}
-                <TanStackDevtools
-                  config={{ position: "bottom-right" }}
-                  plugins={[
-                    {
-                      name: "Tanstack Router",
-                      render: <TanStackRouterDevtoolsPanel />,
-                    },
-                    TanStackQueryDevtools,
-                  ]}
-                />
-                <Scripts />
-              </SidebarInset>
+              <SidebarInset>{children}</SidebarInset>
             </SidebarProvider>
           </TooltipProvider>
+          <>
+            <TanStackRouterDevtools position="bottom-right" />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </>
+          )
+          <Scripts />
         </QueryClientProvider>
       </body>
     </html>

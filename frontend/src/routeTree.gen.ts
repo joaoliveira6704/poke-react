@@ -9,21 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as UnauthenticatedRouteImport } from './routes/_unauthenticated'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UnauthenticatedRegisterRouteImport } from './routes/_unauthenticated/register'
+import { Route as UnauthenticatedLoginRouteImport } from './routes/_unauthenticated/login'
 import { Route as AuthenticatedPokedexIndexRouteImport } from './routes/_authenticated/pokedex/index'
 import { Route as AuthenticatedPokedexNameRouteImport } from './routes/_authenticated/pokedex/$name'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
+  id: '/_unauthenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -34,6 +35,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const UnauthenticatedRegisterRoute = UnauthenticatedRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => UnauthenticatedRoute,
+} as any)
+const UnauthenticatedLoginRoute = UnauthenticatedLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => UnauthenticatedRoute,
 } as any)
 const AuthenticatedPokedexIndexRoute =
   AuthenticatedPokedexIndexRouteImport.update({
@@ -51,14 +62,16 @@ const AuthenticatedPokedexNameRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
-  '/login': typeof LoginRoute
+  '/login': typeof UnauthenticatedLoginRoute
+  '/register': typeof UnauthenticatedRegisterRoute
   '/pokedex/$name': typeof AuthenticatedPokedexNameRoute
   '/pokedex/': typeof AuthenticatedPokedexIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
-  '/login': typeof LoginRoute
+  '/login': typeof UnauthenticatedLoginRoute
+  '/register': typeof UnauthenticatedRegisterRoute
   '/pokedex/$name': typeof AuthenticatedPokedexNameRoute
   '/pokedex': typeof AuthenticatedPokedexIndexRoute
 }
@@ -66,22 +79,32 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
   '/home': typeof HomeRoute
-  '/login': typeof LoginRoute
+  '/_unauthenticated/login': typeof UnauthenticatedLoginRoute
+  '/_unauthenticated/register': typeof UnauthenticatedRegisterRoute
   '/_authenticated/pokedex/$name': typeof AuthenticatedPokedexNameRoute
   '/_authenticated/pokedex/': typeof AuthenticatedPokedexIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/login' | '/pokedex/$name' | '/pokedex/'
+  fullPaths:
+    | '/'
+    | '/home'
+    | '/login'
+    | '/register'
+    | '/pokedex/$name'
+    | '/pokedex/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/login' | '/pokedex/$name' | '/pokedex'
+  to: '/' | '/home' | '/login' | '/register' | '/pokedex/$name' | '/pokedex'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_unauthenticated'
     | '/home'
-    | '/login'
+    | '/_unauthenticated/login'
+    | '/_unauthenticated/register'
     | '/_authenticated/pokedex/$name'
     | '/_authenticated/pokedex/'
   fileRoutesById: FileRoutesById
@@ -89,24 +112,24 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  UnauthenticatedRoute: typeof UnauthenticatedRouteWithChildren
   HomeRoute: typeof HomeRoute
-  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/home': {
       id: '/home'
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_unauthenticated': {
+      id: '/_unauthenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof UnauthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -122,6 +145,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_unauthenticated/register': {
+      id: '/_unauthenticated/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof UnauthenticatedRegisterRouteImport
+      parentRoute: typeof UnauthenticatedRoute
+    }
+    '/_unauthenticated/login': {
+      id: '/_unauthenticated/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof UnauthenticatedLoginRouteImport
+      parentRoute: typeof UnauthenticatedRoute
     }
     '/_authenticated/pokedex/': {
       id: '/_authenticated/pokedex/'
@@ -154,11 +191,25 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface UnauthenticatedRouteChildren {
+  UnauthenticatedLoginRoute: typeof UnauthenticatedLoginRoute
+  UnauthenticatedRegisterRoute: typeof UnauthenticatedRegisterRoute
+}
+
+const UnauthenticatedRouteChildren: UnauthenticatedRouteChildren = {
+  UnauthenticatedLoginRoute: UnauthenticatedLoginRoute,
+  UnauthenticatedRegisterRoute: UnauthenticatedRegisterRoute,
+}
+
+const UnauthenticatedRouteWithChildren = UnauthenticatedRoute._addFileChildren(
+  UnauthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  UnauthenticatedRoute: UnauthenticatedRouteWithChildren,
   HomeRoute: HomeRoute,
-  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
