@@ -53,11 +53,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               <SidebarInset>{children}</SidebarInset>
             </SidebarProvider>
           </TooltipProvider>
-          <>
-            <TanStackRouterDevtools position="bottom-right" />
-            <ReactQueryDevtools initialIsOpen={false} />
-          </>
-          )
+          <TanStackRouterDevtools position="bottom-right" />
+          <ReactQueryDevtools initialIsOpen={false} />
           <Scripts />
         </QueryClientProvider>
       </body>

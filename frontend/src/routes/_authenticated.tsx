@@ -3,15 +3,10 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ context }) => {
-    if (typeof window === "undefined") return;
-
-    const { verifySession } = context.authentication;
-    if (typeof verifySession !== "function") return;
-
-    const user = await verifySession();
-    console.log("verifySession result:", user);
+    const user = await context.authentication.verifySession();
     if (!user) {
       throw redirect({ to: "/login" });
     }
+    return { user };
   },
 });
