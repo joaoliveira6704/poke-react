@@ -4,6 +4,8 @@ import { account } from "../models/account.schema";
 import { user } from "../models/user.schema";
 import { randomUUIDv7 } from "bun";
 import { session } from "../models/session.schema";
+import { password as bpass } from "bun";
+import { verifyPassword } from "../utils/password";
 
 type Body = { username: string; password: string };
 
@@ -26,8 +28,13 @@ export async function login(
       where: (u, { eq }) => eq(u.username, username),
       with: { account: true },
     });
+    console.log(result);
+    const isValidPassword = await verifyPassword(
+      password,
+      result?.account.password,
+    );
 
-    if (!result || result.account?.password !== password) {
+    if (!result || !isValidPassword) {
       return res
         .status(400)
         .send({ code: 400, status: "error", message: "Invalid credentials" });
@@ -114,8 +121,16 @@ export async function registerUser(
     .values({ name, username })
     .returning();
 
+  const hashedPassword = await bpass.hash(password, {
+    algorithm: "bcrypt",
+    cost: 12,
+  });
+
   // Insert account (password)
-  await db.insert(account).values({ userId: newUser.id, password }).returning();
+  await db
+    .insert(account)
+    .values({ userId: newUser.id, password: hashedPassword })
+    .returning();
 
   return res.status(200).send({
     id: newUser.id,

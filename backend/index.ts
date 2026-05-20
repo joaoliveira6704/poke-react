@@ -26,10 +26,6 @@ server.register(v1Routes, { prefix: "/api/v1" });
 
 const start = async () => {
   try {
-    // Runs all pending migrations from the migrations folder
-    await migrate(db, { migrationsFolder: "./drizzle" });
-    console.log("Migrations applied");
-
     await server.listen({ port: 3000 });
   } catch (err) {
     console.error(err);
