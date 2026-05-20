@@ -23,6 +23,9 @@ import {
   MoreVertical,
   UserCircle,
 } from "lucide-react";
+import { Button } from "./ui/button";
+import { useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 
 export function NavUser({
   user,
@@ -34,6 +37,18 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+
+  const fetchCurrentUser = async () => {
+    const res = await fetch("http://localhost:3000/api/v1/users/ash");
+    return res.json();
+  };
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: fetchCurrentUser,
+  });
+
+  const router = useRouter();
 
   return (
     <SidebarMenu>
@@ -49,9 +64,11 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">
+                  {data && data.name}
+                </span>
                 <span className="truncate text-xs text-muted-foreground">
-                  {user.email}
+                  @{data && data.username}
                 </span>
               </div>
               <MoreVertical className="ml-auto size-4" />
@@ -70,9 +87,11 @@ export function NavUser({
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate font-medium">
+                    {data && data.name}
+                  </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {user.email}
+                    @{data && data.username}
                   </span>
                 </div>
               </div>
@@ -84,16 +103,19 @@ export function NavUser({
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
                 <Bell />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => {
+                localStorage.removeItem("auth-token");
+
+                router.navigate({ to: "/login" });
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

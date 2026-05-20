@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { TYPE_COLORS, FALLBACK_COLORS } from "#/constants/colors";
 import FallbackImage from "#/components/images/FallbackImage";
 
-export const Route = createFileRoute("/pokedex/$name")({
+export const Route = createFileRoute("/_authenticated/pokedex/$name")({
   component: RouteComponent,
 });
 
@@ -30,13 +30,13 @@ function StatBar({
 
   return (
     <div className="flex items-center gap-3">
-      <span className="w-24 text-xs font-semibold uppercase tracking-wider text-gray-500 shrink-0">
+      <span className="w-24 text-xs font-semibold uppercase tracking-wider text-gray-500  dark:text-white/80 shrink-0">
         {label}
       </span>
-      <span className="w-8 text-sm font-bold text-gray-700 text-right shrink-0">
+      <span className="w-8 text-sm font-bold text-gray-700 dark:text-white/80 text-right shrink-0">
         {value}
       </span>
-      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-700 ${color}`}
           style={{ width: `${pct}%` }}
@@ -102,7 +102,7 @@ function RouteComponent() {
   const weightKg = (data.weight / 10).toFixed(1);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-800 flex flex-col rounded-tl-xl">
       <div
         className={`relative bg-linear-to-br ${colors.bg} overflow-hidden md:rounded-tl-xl`}
       >
@@ -147,12 +147,11 @@ function RouteComponent() {
             src={`https://raw.githubusercontent.com/wellrccity/pokedex-html-js/refs/heads/master/assets/img/pokemons/poke_${data.id}.gif`}
             fallBackSrc={`https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/detail/${data.id.toString().padStart(3, "0")}.png`}
             alt={name}
-            className="z-20 w-full h-full object-contain dark:brightness-80"
-            //                                     ^ drop `absolute top-0 left-20` too
+            className="z-20 w-full h-60 -translate-y-16 object-contain dark:brightness-80"
           />
         </div>
       </div>
-      <div className="flex-1 bg-white rounded-t-3xl -mt-4 relative z-20 px-6 pt-8 pb-10 shadow-lg">
+      <div className="flex-1 bg-white  dark:bg-neutral-800  rounded-t-3xl -mt-4 relative z-20 px-6 pt-8 pb-10 shadow-lg">
         <div className="grid grid-cols-3 gap-3 mb-8">
           {[
             { label: "Height", value: `${heightM} m` },
@@ -179,10 +178,10 @@ function RouteComponent() {
             </div>
           ))}
         </div>
-        <h2 className="text-base font-extrabold text-gray-800 mb-4 uppercase tracking-widest">
+        <h2 className="text-base font-extrabold text-gray-800 dark:text-white/80 mb-4 uppercase tracking-widest">
           Base Stats
         </h2>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 ">
           {stats.map((s) => (
             <StatBar
               key={s.stat.name}
@@ -199,7 +198,7 @@ function RouteComponent() {
         </div>
         {data.moves && data.moves.length > 0 && (
           <>
-            <h2 className="text-base font-extrabold text-gray-800 mt-8 mb-4 uppercase tracking-widest">
+            <h2 className="text-base font-extrabold text-gray-800 dark:text-white/80 mt-8 mb-4 uppercase tracking-widest">
               Moves
             </h2>
             <div className="flex flex-wrap gap-2">

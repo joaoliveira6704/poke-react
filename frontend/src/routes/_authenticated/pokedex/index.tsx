@@ -4,22 +4,22 @@ import { type Pokemon } from "#/types/Pokemon";
 import { PokemonCard } from "#/components/cards/PokemonCard";
 import { Paginate } from "#/components/Paginate";
 import { PokemonCardSkeleton } from "#/components/cards/PokemonCardSkeleton";
+import { useState } from "react";
 
-export const Route = createFileRoute("/pokedex/")({
-  validateSearch: (search) => ({
-    page: Number(search.page ?? 1),
-  }),
+export const Route = createFileRoute("/_authenticated/pokedex/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { page } = Route.useSearch();
+  const [page, setPage] = useState(1);
   const offset = (page - 1) * 20;
-
+  let maxPage;
+  //ADD DRAGONFLY/REDIS FOR CACHING EXTERNAL API CALLS
   const getPokemons = async () => {
     const response = await fetch(
       `https://pokeapi.co/api/v2/pokemon?limit=20&offset=${offset}`,
     );
+
     return response.json();
   };
 
@@ -27,6 +27,7 @@ function RouteComponent() {
     results: Pokemon[];
     next: string | null;
     previous: string | null;
+    count: number | null;
   }>({
     queryKey: ["pokemons", page],
     queryFn: getPokemons,
@@ -55,7 +56,19 @@ function RouteComponent() {
             ))}
         </div>
 
-        {data?.next && <Paginate previous={data.previous} next={data.next} />}
+        {data && (
+          <Paginate
+            previous={() => {
+              if (page > 1) {
+                setPage(page - 1);
+              }
+            }}
+            next={() => setPage(page + 1)}
+            currentPage={page}
+            count={data.count}
+            click={(page: number) => setPage(page)}
+          />
+        )}
       </div>
     </div>
   );
