@@ -102,7 +102,7 @@ function RouteComponent() {
   const weightKg = (data.weight / 10).toFixed(1);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-neutral-800 flex flex-col rounded-tl-xl">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-800 rounded-bl-xl flex flex-col rounded-tl-xl">
       <div
         className={`relative bg-linear-to-br ${colors.bg} overflow-hidden md:rounded-tl-xl`}
       >
@@ -151,7 +151,7 @@ function RouteComponent() {
           />
         </div>
       </div>
-      <div className="flex-1 bg-white  dark:bg-neutral-800  rounded-t-3xl -mt-4 relative z-20 px-6 pt-8 pb-10 shadow-lg">
+      <div className="flex-1 bg-white  dark:bg-neutral-800 rounded-bl-xl  rounded-t-3xl -mt-4 relative z-20 px-6 pt-8 pb-10 shadow-lg">
         <div className="grid grid-cols-3 gap-3 mb-8">
           {[
             { label: "Height", value: `${heightM} m` },

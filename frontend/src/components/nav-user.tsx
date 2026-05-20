@@ -26,6 +26,7 @@ import {
 import { Button } from "./ui/button";
 import { useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { logoutUser } from "#/auth";
 
 export function NavUser({
   user,
@@ -111,9 +112,7 @@ export function NavUser({
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => {
-                localStorage.removeItem("auth-token");
-
-                router.navigate({ to: "/login" });
+                logoutUser();
               }}
             >
               <LogOut />

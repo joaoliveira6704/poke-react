@@ -1,32 +1,27 @@
-import {
-  createFileRoute,
-  Outlet,
-  useNavigate,
-  useLocation,
-} from "@tanstack/react-router";
-import { requireAuth } from "#/lib/router-auth";
-import { useEffect } from "react";
-import { useAuth } from "#/auth";
+import { verifySession } from "#/lib/utils";
+import { createFileRoute, redirect, isRedirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: requireAuth,
-  component: AuthenticatedLayout,
-});
+  beforeLoad: async ({ location }) => {
+    try {
+      console.log("verifying user");
+      const user = await verifySession();
 
-function AuthenticatedLayout() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { isAuthenticated, isLoading } = useAuth();
+      if (!user) {
+        throw redirect({
+          to: "/login",
+          search: { redirect: location.href },
+        });
+      }
+      return { user };
+    } catch (error) {
+      if (isRedirect(error)) throw error;
 
-  useEffect(() => {
-    if (isLoading) return;
-    if (!isAuthenticated) {
-      navigate({ to: "/login", search: { redirect: location.href } });
+      throw redirect({
+        to: "/login",
+        search: { redirect: location.href },
+      });
     }
-  }, [isLoading, isAuthenticated]);
-
-  if (isLoading) return null;
-
-  return <Outlet />;
-}
+  },
+});

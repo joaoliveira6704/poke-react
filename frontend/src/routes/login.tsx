@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LoginForm } from "#/components/forms/login-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useAuth } from "../auth";
+import { login } from "../auth";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, string | undefined>) => ({
@@ -11,7 +11,6 @@ export const Route = createFileRoute("/login")({
 });
 
 function RouteComponent() {
-  const auth = useAuth();
   const navigate = useNavigate();
   const { redirect: redirectTo } = Route.useSearch();
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +28,7 @@ function RouteComponent() {
     setLoading(true);
 
     try {
-      await auth.login(username, password);
+      await login(username, password);
       navigate({ to: redirectTo || "/" });
     } catch {
       setError("Authentication failed");
