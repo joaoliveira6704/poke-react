@@ -8,6 +8,9 @@ export const Route = createFileRoute("/_unauthenticated/login")({
     redirect: search.redirect,
   }),
   component: RouteComponent,
+  head: () => ({
+    meta: [{ title: "Pokemark - Login" }],
+  }),
 });
 
 function RouteComponent() {

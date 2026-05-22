@@ -8,6 +8,9 @@ import FallbackImage from "#/components/images/FallbackImage";
 
 export const Route = createFileRoute("/_authenticated/pokedex/$name")({
   component: RouteComponent,
+  head: () => ({
+    meta: [{ title: "Pokemark - Pokemon" }],
+  }),
 });
 
 function StatBar({

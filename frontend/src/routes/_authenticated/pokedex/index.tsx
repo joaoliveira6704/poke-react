@@ -8,6 +8,9 @@ import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/pokedex/")({
   component: RouteComponent,
+  head: () => ({
+    meta: [{ title: "Pokemark - Pokedex" }],
+  }),
 });
 
 function RouteComponent() {
